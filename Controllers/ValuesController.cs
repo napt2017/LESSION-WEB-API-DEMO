@@ -10,6 +10,7 @@ namespace LESSION_WEB_API_DEMO.Controllers
     public class ValuesController : ApiController
     {
         // GET api/values
+        [Authorize(Roles = "user")]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
