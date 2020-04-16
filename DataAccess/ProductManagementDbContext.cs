@@ -12,5 +12,7 @@ namespace LESSION_WEB_API_DEMO.DataAccess
 
         public DbSet<Product> Products { get; set; }
         public DbSet<Manufacturer> Manufacturers { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
     }
 }
