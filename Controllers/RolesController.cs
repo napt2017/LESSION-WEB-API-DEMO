@@ -1,33 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+﻿using System.Net; 
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
-using System.Web.Http.Description;
-using LESSION_WEB_API_DEMO.DataAccess;
+using System.Web.Http; 
+using System.Web.Http.Description; 
+
 using LESSION_WEB_API_DEMO.Models;
+using LESSION_WEB_API_DEMO.Repositories;
 
 namespace LESSION_WEB_API_DEMO.Controllers
 {
     public class RolesController : ApiController
     {
-        private ProductManagementDbContext db = new ProductManagementDbContext();
+        private readonly IRoleRepository _roleRepository;
+
+        public RolesController(IRoleRepository roleRepository)
+        {
+            _roleRepository = roleRepository;
+        }
 
         // GET: api/Roles
         public IQueryable<Role> GetRoles()
         {
-            return db.Roles;
+            return _roleRepository.GetAll();
         }
 
         // GET: api/Roles/5
         [ResponseType(typeof(Role))]
         public IHttpActionResult GetRole(int id)
         {
-            Role role = db.Roles.Find(id);
+            Role role = _roleRepository.FindRoleById(id);
             if (role == null)
             {
                 return NotFound();
@@ -50,24 +50,11 @@ namespace LESSION_WEB_API_DEMO.Controllers
                 return BadRequest();
             }
 
-            db.Entry(role).State = EntityState.Modified;
-
-            try
+            var updatedRole = _roleRepository.UpdateRole(id, role);
+            if (updatedRole == null)
             {
-                db.SaveChanges();
+                return NotFound();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RoleExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
             return StatusCode(HttpStatusCode.NoContent);
         }
 
@@ -80,9 +67,7 @@ namespace LESSION_WEB_API_DEMO.Controllers
                 return BadRequest(ModelState);
             }
 
-            db.Roles.Add(role);
-            db.SaveChanges();
-
+            _roleRepository.InsertRole(role);
             return CreatedAtRoute("DefaultApi", new { id = role.Id }, role);
         }
 
@@ -90,30 +75,17 @@ namespace LESSION_WEB_API_DEMO.Controllers
         [ResponseType(typeof(Role))]
         public IHttpActionResult DeleteRole(int id)
         {
-            Role role = db.Roles.Find(id);
+            Role role = _roleRepository.DeleteRole(id);
             if (role == null)
             {
                 return NotFound();
             }
-
-            db.Roles.Remove(role);
-            db.SaveChanges();
-
             return Ok(role);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
         }
 
         private bool RoleExists(int id)
         {
-            return db.Roles.Count(e => e.Id == id) > 0;
+            return _roleRepository.IsExist(id);
         }
     }
 }

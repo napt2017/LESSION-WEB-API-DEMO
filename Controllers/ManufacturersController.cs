@@ -1,33 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+﻿using System.Net; 
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
+using System.Web.Http; 
 using System.Web.Http.Description;
-using LESSION_WEB_API_DEMO.DataAccess;
+
 using LESSION_WEB_API_DEMO.Models;
+using LESSION_WEB_API_DEMO.Repositories;
 
 namespace LESSION_WEB_API_DEMO.Controllers
 {
     public class ManufacturersController : ApiController
     {
-        private ProductManagementDbContext db = new ProductManagementDbContext();
+        private readonly IManufacturerRepository _manufacturerRepository;
+
+        public ManufacturersController(IManufacturerRepository manufacturerRepository)
+        {
+            _manufacturerRepository = manufacturerRepository;
+        }
 
         // GET: api/Manufacturers
         public IQueryable<Manufacturer> GetManufacturers()
         {
-            return db.Manufacturers;
+            return _manufacturerRepository.GetAll();
         }
 
         // GET: api/Manufacturers/5
         [ResponseType(typeof(Manufacturer))]
         public IHttpActionResult GetManufacturer(int id)
         {
-            Manufacturer manufacturer = db.Manufacturers.Find(id);
+            Manufacturer manufacturer = _manufacturerRepository.FindManufacturerById(id);
             if (manufacturer == null)
             {
                 return NotFound();
@@ -50,22 +50,10 @@ namespace LESSION_WEB_API_DEMO.Controllers
                 return BadRequest();
             }
 
-            db.Entry(manufacturer).State = EntityState.Modified;
-
-            try
+            var updatedManufacturer = _manufacturerRepository.UpdateManufacturer(id, manufacturer);
+            if (updatedManufacturer == null)
             {
-                db.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ManufacturerExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
 
             return StatusCode(HttpStatusCode.NoContent);
@@ -80,8 +68,7 @@ namespace LESSION_WEB_API_DEMO.Controllers
                 return BadRequest(ModelState);
             }
 
-            db.Manufacturers.Add(manufacturer);
-            db.SaveChanges();
+            _manufacturerRepository.InsertManufacturer(manufacturer);
 
             return CreatedAtRoute("DefaultApi", new { id = manufacturer.Id }, manufacturer);
         }
@@ -90,30 +77,17 @@ namespace LESSION_WEB_API_DEMO.Controllers
         [ResponseType(typeof(Manufacturer))]
         public IHttpActionResult DeleteManufacturer(int id)
         {
-            Manufacturer manufacturer = db.Manufacturers.Find(id);
+            Manufacturer manufacturer = _manufacturerRepository.DeleteManufacturer(id);
             if (manufacturer == null)
             {
                 return NotFound();
             }
-
-            db.Manufacturers.Remove(manufacturer);
-            db.SaveChanges();
-
             return Ok(manufacturer);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
         }
 
         private bool ManufacturerExists(int id)
         {
-            return db.Manufacturers.Count(e => e.Id == id) > 0;
+            return _manufacturerRepository.IsExist(id);
         }
     }
 }

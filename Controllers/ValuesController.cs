@@ -16,6 +16,7 @@ namespace LESSION_WEB_API_DEMO.Controllers
             return new string[] { "value1", "value2" };
         }
 
+        [Authorize(Roles ="admin")]
         // GET api/values/5
         public string Get(int id)
         {
