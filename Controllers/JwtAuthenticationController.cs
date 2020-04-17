@@ -14,15 +14,26 @@ using System.Data.Entity;
 
 namespace LESSION_WEB_API_DEMO.Controllers
 {
+    /// <summary>
+    /// My authentication controller using jwt
+    /// </summary>
     public class JwtAuthenticationController : ApiController
     {
         private readonly ProductManagementDbContext dbContext;
 
+        /// <summary>
+        /// The constructor
+        /// </summary>
         public JwtAuthenticationController()
         {
             dbContext = new ProductManagementDbContext();
         }
 
+        /// <summary>
+        ///  Get info from user then generate the jwt token
+        /// </summary>
+        /// <param name="authenticationInfo"></param>
+        /// <returns>JwtToken</returns>
         [ResponseType(typeof(JwtToken))]
         public JwtToken PostAuthenticationInfo(AuthenticationInfo authenticationInfo)
         {
