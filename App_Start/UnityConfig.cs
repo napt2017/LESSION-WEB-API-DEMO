@@ -4,6 +4,7 @@ using System.Web.Http;
 
 using LESSION_WEB_API_DEMO.DataAccess;
 using LESSION_WEB_API_DEMO.Repositories;
+using LESSION_WEB_API_DEMO.Models;
 
 namespace LESSION_WEB_API_DEMO
 {
@@ -23,6 +24,8 @@ namespace LESSION_WEB_API_DEMO
             container.RegisterType<IManufacturerRepository, ManufacturerRepository>();
             container.RegisterType<IRoleRepository, RoleRepository>();
             container.RegisterType<IUserRepository, UserRepository>();
+            container.RegisterType<BookStoreDatabaseSettings>();
+            container.RegisterType<IBookRepository, BookRepository>();
             
             GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
         }
