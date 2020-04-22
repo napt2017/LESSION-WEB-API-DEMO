@@ -26,6 +26,8 @@ namespace LESSION_WEB_API_DEMO
             container.RegisterType<IUserRepository, UserRepository>();
             container.RegisterType<BookStoreDatabaseSettings>();
             container.RegisterType<IBookRepository, BookRepository>();
+            container.RegisterSingleton<ExternalApiInfo>();
+            container.RegisterType<ISlideRepository, SlideRepository>();
             
             GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
         }

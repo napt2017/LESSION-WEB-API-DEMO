@@ -26,9 +26,9 @@ namespace LESSION_WEB_API_DEMO.Repositories
         }
 
         public Book Create(Book book)
-        {
+        { 
             _books.InsertOne(book);
-            return book;
+            return book; 
         }
 
         public List<Book> Get()
